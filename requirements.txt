@@ -1,0 +1,5 @@
+fastembed==0.3.6
+
+clip>=1.0
+torch>=2.4.0
+pillow>=10.4.0
