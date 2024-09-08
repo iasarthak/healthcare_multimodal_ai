@@ -1,2 +1,6 @@
 .env
 test_data/
+/data_old/
+/qdrant_storage/
+/roco-dataset/
+

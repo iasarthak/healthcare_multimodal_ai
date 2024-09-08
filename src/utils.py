@@ -4,9 +4,10 @@ import torch
 from PIL import Image
 from fastembed import TextEmbedding
 
-def convert_text_to_embeddings(text_documents: list[str]):
+
+def convert_text_to_embeddings(text_document):
     text_embedding_model = TextEmbedding()
-    text_embeddings = text_embedding_model.embed(text_documents)  # Returns a generator of embeddings
+    text_embeddings = text_embedding_model.embed(text_document)  # Returns a generator of embeddings
     return text_embeddings
 
 
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     # for embedding in embeddings:
     #     print(embedding)
 
-    image_path = "/Users/sarthak/Documents/Work/Personal_Projects/healthcare_multimodal_ai/test_data/img.png"
+    image_path = "/Users/sarthak/Documents/Work/Personal_Projects/healthcare_multimodal_ai/data/images/ROCO_00796.jpg"
     image_embedding = convert_image_to_embeddings(image_path)
 
     descriptions = [
