@@ -4,9 +4,12 @@ import torch
 from PIL import Image
 from fastembed import TextEmbedding
 
+TEXT_MODEL_NAME = "Qdrant/clip-ViT-B-32-text"
+
 
 def convert_text_to_embeddings(text_document):
-    text_embedding_model = TextEmbedding()
+    embedding_model = TEXT_MODEL_NAME
+    text_embedding_model = TextEmbedding(model_name=embedding_model)
     text_embeddings = text_embedding_model.embed(text_document)  # Returns a generator of embeddings
     return text_embeddings
 

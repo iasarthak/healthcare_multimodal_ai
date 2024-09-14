@@ -1,6 +1,6 @@
+clip==1.0
 fastembed==0.3.6
-
-clip>=1.0
-torch>=2.4.0
-pillow>=10.4.0
-pandas>=2.2.2
+pandas==2.2.2
+Pillow==10.4.0
+qdrant_client==1.11.1
+torch==2.4.0
