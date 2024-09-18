@@ -5,7 +5,8 @@ import pandas as pd
 from fastembed import TextEmbedding, ImageEmbedding
 from qdrant_client import QdrantClient, models
 
-from src.utils import convert_text_to_embeddings, convert_image_to_embeddings, TEXT_MODEL_NAME, IMAGE_MODEL_NAME
+from src.embeddings_utils import convert_text_to_embeddings, convert_image_to_embeddings, TEXT_MODEL_NAME, \
+    IMAGE_MODEL_NAME
 
 DATA_PATH = '/Users/sarthak/Documents/Work/Personal_Projects/healthcare_multimodal_ai/data/'
 COLLECTION_NAME = "medical_images_text"
@@ -14,6 +15,18 @@ COLLECTION_NAME = "medical_images_text"
 def create_uuid_from_image_id(image_id):
     NAMESPACE_UUID = uuid.UUID('12345678-1234-5678-1234-567812345678')
     return str(uuid.uuid5(NAMESPACE_UUID, image_id))
+
+
+def search_similar_text(client, query, limit=3):
+    text_model = TextEmbedding(model_name=TEXT_MODEL_NAME)
+    search_query = text_model.embed([query])
+    search_results = client.search(
+        collection_name=COLLECTION_NAME,
+        query_vector=('text', list(search_query)[0]),
+        with_payload=['image_path', 'caption'],
+        limit=limit,
+    )
+    return search_results
 
 
 def create_embeddings():
@@ -86,17 +99,7 @@ def create_embeddings():
             for doc in image_docs
         ]
     )
-
-    search_query = text_model.embed(["I'm facing some issue in my spine, what issue I might be facing?"])
-    # Search for the image and export it to the output folder
-    search_results = client.search(
-        collection_name=COLLECTION_NAME,
-        query_vector=('text', list(search_query)[0]),
-        with_payload=['image_path'],
-        limit=3,
-    )
-
-    print(search_results)
+    return client
 
 
 if __name__ == "__main__":
