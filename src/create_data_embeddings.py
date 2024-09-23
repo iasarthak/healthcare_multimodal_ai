@@ -29,6 +29,29 @@ def search_similar_text(client, query, limit=3):
     return search_results
 
 
+def search_similar_image(client, query_image_path, limit=3):
+    # Convert the query image into an embedding using the same model used for image embeddings
+    image_embedding_model = ImageEmbedding(model_name=IMAGE_MODEL_NAME)
+
+    # Embed the provided query image (assumed to be a file path)
+    query_image_embedding = list(image_embedding_model.embed([query_image_path]))[0]  # Embedding for the query image
+
+    # Perform the similarity search in the Qdrant collection for image embeddings
+    search_results = client.search(
+        collection_name=COLLECTION_NAME,
+        query_vector=('image', query_image_embedding),
+        with_payload=['image_path', 'caption'],  # Fetch image paths and captions as metadata
+        limit=limit,
+    )
+    return search_results
+
+
+def merge_results(text_results, image_results):
+    # Combine based on some metadata, or simply concatenate
+    combined_results = text_results + image_results
+    return combined_results
+
+
 def create_embeddings():
     # Read captions txt data
     path = DATA_PATH + 'captions.txt'
