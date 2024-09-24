@@ -17,9 +17,14 @@ class GPTClient:
             "Authorization": f"Bearer {self.api_key}"
         }
 
+        chatbot_role = """
+        You are a radiologist with an experience of 30 years. 
+        You analyse medical scans and text, and help diagnose underlying issues.
+        """
+
         # Initialize message structure with the system prompt
         messages = [
-            {"role": "system", "content": "You are a helpful assistant analyzing medical reports and images."},
+            {"role": "system", "content": chatbot_role},
             {"role": "user", "content": [
                 {"type": "text", "text": prompt}
             ]}
@@ -35,6 +40,14 @@ class GPTClient:
                         "url": f"data:image/jpeg;base64,{base64_image}"
                     }
                 })
+
+        messages[1]["content"].append({
+            "type": "text",
+            "text": "Additional context that you may use as a reference. Use them if you feel they are relevant to "
+                    "the case."
+                    "NOTE: They are not the patient's images. They are of other patients which can be used as a "
+                    "reference, if required."
+        })
 
         # Add the retrieved contexts, which should include both captions and corresponding images
         for context in retrieved_contexts:
@@ -61,7 +74,7 @@ class GPTClient:
         data = {
             "model": "gpt-4o",
             "messages": messages,
-            "max_tokens": 300
+            "max_tokens": 600
         }
 
         # Send the request to the API
