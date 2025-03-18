@@ -1,3 +1,4 @@
+#%%
 import base64
 import json
 
@@ -5,11 +6,16 @@ import requests
 
 from config import Config
 
-
+#%%
 class GPTClient:
     def __init__(self):
         self.api_key = Config.OPENAI_API_KEY
         self.api_url = "https://api.openai.com/v1/chat/completions"
+
+        if not self.api_key:
+            print("Error: API Key is missing")
+        else:
+            print(f"Using OpenAI API Key:{self.api_key[:5]}....") #partial key for security
 
     def query(self, prompt, retrieved_contexts, user_image=None):
         headers = {
@@ -32,14 +38,20 @@ class GPTClient:
 
         # Add the user-uploaded image (if any)
         if user_image:
-            with open(user_image, "rb") as image_file:
-                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-                messages[1]["content"].append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                    }
-                })
+            try:
+                
+                with open(user_image, "rb") as image_file:
+                    base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                    messages[1]["content"].append({
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                    })
+
+            except Exception as e:
+                print(f"Error loading user image:{e}")
+
 
         messages[1]["content"].append({
             "type": "text",
@@ -61,14 +73,17 @@ class GPTClient:
             })
 
             # Add the corresponding image to the message
-            with open(image_path, "rb") as image_file:
-                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-                messages[1]["content"].append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                    }
-                })
+            try:
+                with open(image_path, "rb") as image_file:
+                    base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                    messages[1]["content"].append({
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                    })
+            except Exception as e:
+                print(f"Error loading retrieved image:{e}")
 
         # Prepare the payload for the GPT API
         data = {
@@ -77,10 +92,35 @@ class GPTClient:
             "max_tokens": 600
         }
 
-        # Send the request to the API
-        response = requests.post(self.api_url, headers=headers, data=json.dumps(data))
-        return response.json()
+        print("Sending API request")
+
+        try:
+            print("Sending request to OpenAI API...")  # Debug
+            response = requests.post(self.api_url, headers=headers, data=json.dumps(data))
+
+            # Debug: Print API response
+            print(f"API Response Status: {response.status_code}")
+            try:
+                print("API Response JSON:", response.json())  # Debug: Print JSON response
+            except json.JSONDecodeError:
+                print("Error decoding API response JSON")
+
+            if response.status_code == 401:
+                print("Error: OpenAI API Key is invalid or expired!")
+
+            return response.json()
+
+        except requests.exceptions.RequestException as e:
+            print(f"API Request Failed: {e}")
+            return {"error": "API request failed"}
 
     def process_response(self, response):
-        if 'choices' in response and len(response['choices']) > 0:
+        if response and 'choices' in response and len(response['choices']) > 0:
             return response['choices'][0]['message']['content']
+        return "No valid response received"
+
+
+
+
+
+

@@ -1,8 +1,13 @@
+#%%
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.create_data_embeddings import create_embeddings
 from src.embeddings_utils import search_similar_text, search_similar_image, merge_results
 from src.gpt_utils import GPTClient
 
-
+#%%
 COLLECTION_NAME = "medical_images_text"
 
 
@@ -44,9 +49,10 @@ if __name__ == "__main__":
                   "Can you analyze the scan and provide insights based on the patient’s "
                   "symptoms and the attached scan?"
                   "Just give a concise analysis about the patient and not other context attached.")
-    user_image_path = ("/Users/sarthak/Documents/Work/Personal_Projects/healthcare_multimodal_ai/data"
-                       "/ROCO_80642_neck_test.jpg")  # Example path to an image file
+    user_image_path = (r"C:\Users\Lenovo pc\OneDrive\Documents\GitHub\healthcare_multimodal_ai\data\neck_test.jpg")  # Example path to an image file
 
     response = system.process_query(user_query, query_image_path=user_image_path)
     print(f"User Query: {user_query}")
     print(f"System Response: {response}")
+
+# %%

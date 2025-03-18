@@ -1,15 +1,17 @@
+#%%
 import os
 import uuid
 
 import pandas as pd
 from fastembed import TextEmbedding, ImageEmbedding
 from qdrant_client import QdrantClient, models
-
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#%%
 from src.embeddings_utils import convert_text_to_embeddings, convert_image_to_embeddings, TEXT_MODEL_NAME, \
     IMAGE_MODEL_NAME
 
-DATA_PATH = '/Users/sarthak/Documents/Work/Personal_Projects/healthcare_multimodal_ai/data/'
-
+DATA_PATH = r'C:\Users\Lenovo pc\OneDrive\Documents\GitHub\healthcare_multimodal_ai\data'
 
 def create_uuid_from_image_id(image_id):
     NAMESPACE_UUID = uuid.UUID('12345678-1234-5678-1234-567812345678')
@@ -18,11 +20,11 @@ def create_uuid_from_image_id(image_id):
 
 def create_embeddings(collection_name):
     # Read captions txt data
-    path = DATA_PATH + 'captions.txt'
+    path = os.path.join(DATA_PATH,'captions.txt')
     caption_df = pd.read_csv(path, sep='\t', header=None, names=['image_id', 'caption'])
 
     # Read images
-    image_directory = os.listdir(DATA_PATH + 'images')
+    image_directory = os.listdir(os.path.join(DATA_PATH,'images'))
 
     # Filter out images that are not in the captions
     images = []
@@ -87,3 +89,5 @@ def create_embeddings(collection_name):
         ]
     )
     return client
+
+# %%
